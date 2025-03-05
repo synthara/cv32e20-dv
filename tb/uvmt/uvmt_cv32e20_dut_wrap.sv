@@ -128,6 +128,18 @@ module uvmt_cv32e20_dut_wrap #(
     snt_std_if xcs_std();
     always_comb xcs_std.clk = clknrst_if.clk;
     always_comb xcs_std.resetn = clknrst_if.reset_n;
+
+    // TEMPORARY SIGNALS TO TEST SSR
+    logic [NUM_RF_PORT-1:0] ssr_valid;
+    logic [NUM_RF_PORT-1:0] ssr_ready;
+    logic [NUM_RF_PORT-1:0][4:0] ssr_addr;
+    logic [NUM_RF_READ_PORT-1:0][31:0] ssr_rdata;
+    logic [NUM_RF_WRITE_PORT-1:0][31:0] ssr_wdata;
+
+    always_comb ssr_ready = '1;
+    always_comb ssr_rdata[0] = 32'd10;
+    always_comb ssr_rdata[1] = 32'd10;
+    always_comb ssr_rdata[2] = 32'd10;
 //---------------------------------------------------------------------------------
 
 
@@ -185,6 +197,13 @@ module uvmt_cv32e20_dut_wrap #(
          .xcs_cv_x_if_result(cv_x_if_result),
          // CSR vec mode.
          .csr_vec_mode(csr_vec_mode),
+
+         // SSR interfaces
+         .ssr_valid_o(ssr_valid),
+         .ssr_ready_i(ssr_ready),
+         .ssr_addr_o(ssr_addr),
+         .ssr_rdata_i(ssr_rdata),
+         .ssr_wdata_o(ssr_wdata),
 //---------------------------------------------------------------------------------
 
          // Interrupt inputs
