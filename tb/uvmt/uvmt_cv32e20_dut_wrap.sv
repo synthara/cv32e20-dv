@@ -126,21 +126,27 @@ module uvmt_cv32e20_dut_wrap #(
     status_if#(.DTYPE(data_csr_dtype)) csr_vec_mode();
 
     snt_std_if xcs_std();
+    snt_std_if dmv_std();
     always_comb xcs_std.clk = clknrst_if.clk;
     always_comb xcs_std.resetn = clknrst_if.reset_n;
+    always_comb dmv_std.clk = clknrst_if.clk;   
+    always_comb dmv_std.resetn = clknrst_if.reset_n;
 
-    // TEMPORARY SIGNALS TO TEST SSR
+    // Signals used for datamover integration
     logic [NUM_RF_PORT-1:0] ssr_valid;
     logic [NUM_RF_PORT-1:0] ssr_ready;
     logic [NUM_RF_PORT-1:0][4:0] ssr_addr;
     logic [NUM_RF_READ_PORT-1:0][31:0] ssr_rdata;
     logic [NUM_RF_WRITE_PORT-1:0][31:0] ssr_wdata;
 
-    always_comb ssr_ready = '1;
-    always_comb ssr_rdata[0] = 32'd10;
-    always_comb ssr_rdata[1] = 32'd10;
-    always_comb ssr_rdata[2] = 32'd10;
+    logic data_req, data_gnt, data_rvalid, data_we;
+    logic [31:0] data_addr, data_wdata, data_rdata;
+    logic [3:0] data_be;
+
+    logic [31:0] csr_ssr_cfg;
 //---------------------------------------------------------------------------------
+
+
 
 
 
@@ -175,14 +181,14 @@ module uvmt_cv32e20_dut_wrap #(
          .instr_err_i            ( '0                             ),
 
          // Data memory interface
-         .data_req_o             ( obi_memory_data_if.req         ),
-         .data_gnt_i             ( obi_memory_data_if.gnt         ),
-         .data_rvalid_i          ( obi_memory_data_if.rvalid      ),
-         .data_we_o              ( obi_memory_data_if.we          ),
-         .data_be_o              ( obi_memory_data_if.be          ),
-         .data_addr_o            ( obi_memory_data_if.addr        ),
-         .data_wdata_o           ( obi_memory_data_if.wdata       ),
-         .data_rdata_i           ( obi_memory_data_if.rdata       ),
+         .data_req_o             ( data_req                       ),
+         .data_gnt_i             ( data_gnt                       ),
+         .data_rvalid_i          ( data_rvalid                    ),
+         .data_we_o              ( data_we                        ),
+         .data_be_o              ( data_be                        ),
+         .data_addr_o            ( data_addr                      ), 
+         .data_wdata_o           ( data_wdata                     ),
+         .data_rdata_i           ( data_rdata                     ),
          .data_err_i             ( '0                             ),
 
 //---------------------------------------------------------------------------------
@@ -204,6 +210,9 @@ module uvmt_cv32e20_dut_wrap #(
          .ssr_addr_o(ssr_addr),
          .ssr_rdata_i(ssr_rdata),
          .ssr_wdata_o(ssr_wdata),
+
+         // SSR config CSR register 
+         .csr_ssr_cfg_o(csr_ssr_cfg),
 //---------------------------------------------------------------------------------
 
          // Interrupt inputs
@@ -230,7 +239,7 @@ module uvmt_cv32e20_dut_wrap #(
 
 
 //---------------------------------------------------------------------------------
-      // Instantiate the co-processor
+      // Coporcessor instance
        rvv_xcs i_rvv_xcs
        (
          .xcs_std(xcs_std),
@@ -239,6 +248,73 @@ module uvmt_cv32e20_dut_wrap #(
          .xcs_cv_x_if_commit(cv_x_if_commit),
          .xcs_cv_x_if_result(cv_x_if_result),
          .csr_vec_mode(csr_vec_mode)
+       );
+//---------------------------------------------------------------------------------
+      // Datamover instance
+
+      // Enable interface
+      status_if#(.DTYPE(logic[NUM_AGU-1:0])) dmv_enable();
+      always_comb dmv_enable.packet = csr_ssr_cfg[NUM_AGU-1:0];
+
+      // Config request interface
+      val_ena_if#(.DTYPE(dmv_config_req_dtype)) dmv_config_req();
+      always_comb dmv_config_req.valid = data_req;
+      always_comb data_gnt = dmv_config_req.enable;
+      always_comb dmv_config_req.packet.config_addr = data_addr;
+      always_comb dmv_config_req.packet.config_wdata = data_wdata;
+      always_comb dmv_config_req.packet.config_we = data_we;
+      always_comb dmv_config_req.packet.config_be = data_be;
+
+      // Config response interface
+      val_if#(.DTYPE(data_dtype)) dmv_config_resp();
+      always_comb data_rvalid = dmv_config_resp.valid;
+      always_comb data_rdata = dmv_config_resp.packet;
+
+      // Read interface 
+      val_ena_req_resp_if#(.DTYPE_REQ(stream_addr_dtype), .DTYPE_RESP(data_dtype)) dmv_read[NUM_RF_READ_PORT-1:0]();
+      for(genvar RF_READ_PORT_IDX = 0; RF_READ_PORT_IDX < NUM_RF_READ_PORT; RF_READ_PORT_IDX++) begin
+          always_comb dmv_read[RF_READ_PORT_IDX].valid = ssr_valid[RF_READ_PORT_IDX];
+          always_comb ssr_ready[RF_READ_PORT_IDX] = dmv_read[RF_READ_PORT_IDX].enable;
+          always_comb dmv_read[RF_READ_PORT_IDX].req_packet = ssr_addr[RF_READ_PORT_IDX];
+          always_comb ssr_rdata[RF_READ_PORT_IDX] = dmv_read[RF_READ_PORT_IDX].resp_packet;
+      end
+
+      // Write interface
+      val_ena_if#(.DTYPE(dmv_write_req_dtype)) dmv_write[NUM_RF_WRITE_PORT-1:0]();
+      for(genvar RF_WRITE_PORT_IDX = 0; RF_WRITE_PORT_IDX < NUM_RF_WRITE_PORT; RF_WRITE_PORT_IDX++) begin
+          always_comb dmv_write[RF_WRITE_PORT_IDX].valid = ssr_valid[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX];
+          always_comb ssr_ready[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX] = dmv_write[RF_WRITE_PORT_IDX].enable;
+          always_comb dmv_write[RF_WRITE_PORT_IDX].packet.dmv_waddr = ssr_addr[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX];
+          always_comb dmv_write[RF_WRITE_PORT_IDX].packet.dmv_wdata = ssr_wdata[RF_WRITE_PORT_IDX];
+      end
+
+
+      // Memory request interface
+      val_ena_if#(.DTYPE(dmv_mem_req_dtype)) dmv_mem_req[NUM_AGU-1:0]();
+      assign obi_memory_data_if.req = dmv_mem_req[0].valid;
+      assign dmv_mem_req[0].enable = obi_memory_data_if.gnt;
+      assign obi_memory_data_if.addr = dmv_mem_req[0].packet.mem_addr;
+      assign obi_memory_data_if.wdata = dmv_mem_req[0].packet.mem_wdata;
+      assign obi_memory_data_if.we = dmv_mem_req[0].packet.mem_we;
+      assign obi_memory_data_if.be = dmv_mem_req[0].packet.mem_be;
+
+      // Memory response interface
+      val_if#(.DTYPE(data_dtype)) dmv_mem_resp[NUM_AGU-1:0]();
+      always_comb dmv_mem_resp[0].valid = obi_memory_data_if.rvalid;
+      always_comb dmv_mem_resp[0].packet = obi_memory_data_if.rdata;
+
+
+
+       trs_dmv i_trs_dmv
+       (
+         .dmv_std(dmv_std),
+         .dmv_enable(dmv_enable),
+         .dmv_config_req(dmv_config_req),
+         .dmv_config_resp(dmv_config_resp),
+         .dmv_read(dmv_read),
+         .dmv_write(dmv_write),
+         .dmv_mem_req(dmv_mem_req),
+         .dmv_mem_resp(dmv_mem_resp)
        );
 //---------------------------------------------------------------------------------
 
