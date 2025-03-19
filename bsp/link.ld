@@ -57,7 +57,13 @@ SECTIONS
   .text : { *(.text) }
 
   /* data segment */
-  .data : { *(.data) }
+   .data :
+  {
+    PROVIDE(ssr_data = .);  /* Define the start address of ssr_data */
+    . += 40;  /* Reserve 40 bytes (10 values, each 4 bytes) */
+    *(.data)
+  } > ram
+
 
   .sdata : {
     __global_pointer$ = . + 0x800;
@@ -85,6 +91,14 @@ SECTIONS
     _tbss_end = .;
   }
 
+  /* Specialized Unit Register Mapping */
+  .dmv_config_start_address (0x1A310000) :
+  {
+    PROVIDE(dmv_config_start_address = .); /* Define a global symbol */
+    KEEP(*(.dmv_config_start_address));
+    . += 0x18;  /* Reserve 24 bytes (6 registers) */
+  }
+  
   .heap : ALIGN(16)
   {
    PROVIDE(__heap_start = ORIGIN(ram) + LENGTH(ram) - _stack_size - _debugger_stack_size - _heap_size);
