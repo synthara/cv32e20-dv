@@ -79,28 +79,33 @@ main:
                   ##### START WRITE #####
                   # Config DMV registers
                   la x15, ssr_data
-                  li x16, 0x2 # HWLPs bound
+                  li x16, 0x3 # HWLPs bound
                   li x17, 0x4 # HWLPs stride (int size)
                   li x18, 0x1 # Write mode 
+
+                  li x24, 0x4
+                  li x25, 0x2
 
                   la x19, dmv_config_start_address
                   sw x15, 0(x19)
                   sw x16, 4(x19)
-                  sw x16, 8(x19)
+                  sw x18, 8(x19)
                   sw x17, 12(x19)
                   sw x17, 16(x19)
                   sw x18, 20(x19)
 
                   li x20, 0xa 
 
+                  
+
                   csrwi 0x7c0, 0x1 # Enable SSR 
 
                   li  a1, 0 # outer loop index
 outer_loop_write:
-                  beq a1, x16, loop_end_write
+                  beq a1, x25, loop_end_write
                   li a0, 0 # inner loop index
 inner_loop_write:
-                  beq a0, x16, update_outer_loop_index_write
+                  beq a0, x24, update_outer_loop_index_write
                   add x30, a0, x20
                   addi a0, a0, 0x1
                   j inner_loop_write
@@ -122,10 +127,10 @@ loop_end_write:
 
                   li  a1, 0 # outer loop index
 outer_loop_read:
-                  beq a1, x16, loop_end_read
+                  beq a1, x25, loop_end_read
                   li a0, 0 # inner loop index
 inner_loop_read:
-                  beq a0, x16, update_outer_loop_index_read
+                  beq a0, x24, update_outer_loop_index_read
                   add x31, x30, x0
                   addi a0, a0, 0x1
                   j inner_loop_read

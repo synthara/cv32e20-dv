@@ -305,7 +305,7 @@ module uvmt_cv32e20_dut_wrap #(
 
 
 
-       trs_dmv i_trs_dmv
+       sls_dmv i_sls_dmv
        (
          .dmv_std(dmv_std),
          .dmv_enable(dmv_enable),
