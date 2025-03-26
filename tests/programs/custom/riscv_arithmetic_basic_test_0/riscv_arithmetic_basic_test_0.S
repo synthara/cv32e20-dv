@@ -158,60 +158,6 @@ main:             li         s0, 0x0 #start riscv_int_numeric_corner_stream_39
                   auipc      t6, 688967
                   nop
                   mulhsu     s1, t1, a6
-
-                  ############ SSR TEST ############
-                  li         x17, 0x75000000 # Base address for configuration
-                  li         x18, 0x76000000 # Base address for AGU
-                  li         x19, 0x2 # Bound for HWLPs. Two for loops N-1
-                  li         x20, 0x4 # Stride for HWLPs. Integer size
-                  li         x21, 1 # Operation mode: write
-                  li         x30, 0x10
-                  li         x16, 0x20
-
-                  # Initialize the memory locations where the AGU will retrive the values
-                  # COMMENT FOR WRITE TEST
-                  #sw         x30, 0(x18)
-                  #sw         x30, 4(x18)
-                  #sw         x30, 8(x18)
-                  #sw         x30, 12(x18)
-
-                  # Configuration
-                  # AGU 0
-                  sw         x18, 0(x17)
-                  sw         x19, 4(x17) 
-                  sw         x19, 8(x17)
-                  sw         x20, 12(x17)
-                  sw         x20, 16(x17)
-                  sw         x21, 20(x17)
-
-                  # Two nested loops
-                  li         x22, 0 # outer loop index
-                  li         x24, 2 # outer loop Bound
-                  li         x25, 2 # inner loop bound
-                  # Enable SSR 
-                  csrwi      0x7c0, 0x1
-outer_loop:
-                  beq        x22, x24, loop_end
-                  li         x23, 0 # inner loop index
-inner_loop:
-                  beq        x23, x25, update_outer_loop_index
-                  #add       x29, x30, x16
-                  add        x30, x16, x16
-                  #add        x30, x16, x16
-                  addi       x23, x23, 0x1
-                  j          inner_loop
-
-update_outer_loop_index:
-                  addi       x22, x22, 0x1
-                  j          outer_loop
-loop_end:
-                  # Disable SSR 
-                  csrwi      0x7c0, 0x0
-                  # COMMENT FOR READ TEST
-                  lw         x31, 0(x18)
-                  lw         x31, 4(x18)
-                  lw         x31, 8(x18)
-                  lw         x31, 12(x18)
                   mulhsu     s1, t1, a6
                   nop
                   nop
@@ -219,9 +165,6 @@ loop_end:
                   sub        a7, a6, t1
                   nop
                   mulhu      s1, t1, a6
-                  #csrwi      0x7c0, 0x1
-                  li         x17, 0x76000000
-                  sw         x17, 0(x17)
                   addi       ra, s6, 999
                   nop
                   sub        a7, a6, t1
@@ -434,9 +377,6 @@ loop_end:
                   li         a6, 0x0
                   li         t5, 0x0
                   mulhsu     a5, s8, s2
-                  li         t5, 0xa
-                  li         t6, 0xa
-                  cv.max     t4, t5, t6
                   addi       a6, s2, 999
                   mulhu      s0, a4, s8
                   nop
