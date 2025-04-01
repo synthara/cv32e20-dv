@@ -253,69 +253,74 @@ module uvmt_cv32e20_dut_wrap #(
       // Datamover instance
 
       // Enable interface
-      status_if#(.DTYPE(logic[NUM_AGU-1:0])) dmv_enable();
-      always_comb dmv_enable.packet = csr_ssr_cfg[NUM_AGU-1:0];
+      status_if#(.DTYPE(cpu_dmv_start_status_dtype)) cpu_dmv_start_status();
+      always_comb cpu_dmv_start_status.packet = csr_ssr_cfg[NUM_AGU-1:0];
 
       // Config request interface
-      val_ena_if#(.DTYPE(dmv_config_req_dtype)) dmv_config_req();
-      always_comb dmv_config_req.valid = data_req;
-      always_comb data_gnt = dmv_config_req.enable;
-      always_comb dmv_config_req.packet.config_addr = data_addr;
-      always_comb dmv_config_req.packet.config_wdata = data_wdata;
-      always_comb dmv_config_req.packet.config_we = data_we;
-      always_comb dmv_config_req.packet.config_be = data_be;
+      val_ena_if#(.DTYPE(cpu_dmv_lsu_request_packet_dtype)) cpu_dmv_lsu_request();
+      always_comb cpu_dmv_lsu_request.valid = data_req;
+      always_comb data_gnt = cpu_dmv_lsu_request.enable;
+      always_comb cpu_dmv_lsu_request.packet.address = data_addr;
+      always_comb cpu_dmv_lsu_request.packet.data = data_wdata;
+      always_comb cpu_dmv_lsu_request.packet.we = data_we;
+      always_comb cpu_dmv_lsu_request.packet.be = data_be;
 
       // Config response interface
-      val_if#(.DTYPE(data_dtype)) dmv_config_resp();
-      always_comb data_rvalid = dmv_config_resp.valid;
-      always_comb data_rdata = dmv_config_resp.packet;
+      val_if#(.DTYPE(data_dtype)) dmv_cpu_lsu_response();
+      always_comb data_rvalid = dmv_cpu_lsu_response.valid;
+      always_comb data_rdata = dmv_cpu_lsu_response.packet;
 
       // Read interface 
-      val_ena_req_resp_if#(.DTYPE_REQ(stream_addr_dtype), .DTYPE_RESP(data_dtype)) dmv_read[NUM_RF_READ_PORT-1:0]();
+      val_ena_req_resp_if#(.DTYPE_REQ(stream_addr_dtype), .DTYPE_RESP(data_dtype)) cpu_dmv_read[NUM_RF_READ_PORT-1:0]();
       for(genvar RF_READ_PORT_IDX = 0; RF_READ_PORT_IDX < NUM_RF_READ_PORT; RF_READ_PORT_IDX++) begin
-          always_comb dmv_read[RF_READ_PORT_IDX].valid = ssr_valid[RF_READ_PORT_IDX];
-          always_comb ssr_ready[RF_READ_PORT_IDX] = dmv_read[RF_READ_PORT_IDX].enable;
-          always_comb dmv_read[RF_READ_PORT_IDX].req_packet = ssr_addr[RF_READ_PORT_IDX];
-          always_comb ssr_rdata[RF_READ_PORT_IDX] = dmv_read[RF_READ_PORT_IDX].resp_packet;
+          always_comb cpu_dmv_read[RF_READ_PORT_IDX].valid = ssr_valid[RF_READ_PORT_IDX];
+          always_comb ssr_ready[RF_READ_PORT_IDX] = cpu_dmv_read[RF_READ_PORT_IDX].enable;
+          always_comb cpu_dmv_read[RF_READ_PORT_IDX].req_packet = ssr_addr[RF_READ_PORT_IDX];
+          always_comb ssr_rdata[RF_READ_PORT_IDX] = cpu_dmv_read[RF_READ_PORT_IDX].resp_packet;
       end
 
       // Write interface
-      val_ena_if#(.DTYPE(dmv_write_req_dtype)) dmv_write[NUM_RF_WRITE_PORT-1:0]();
+      val_ena_if#(.DTYPE(cpu_dmv_write_packet_dtype)) cpu_dmv_write[NUM_RF_WRITE_PORT-1:0]();
       for(genvar RF_WRITE_PORT_IDX = 0; RF_WRITE_PORT_IDX < NUM_RF_WRITE_PORT; RF_WRITE_PORT_IDX++) begin
-          always_comb dmv_write[RF_WRITE_PORT_IDX].valid = ssr_valid[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX];
-          always_comb ssr_ready[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX] = dmv_write[RF_WRITE_PORT_IDX].enable;
-          always_comb dmv_write[RF_WRITE_PORT_IDX].packet.dmv_waddr = ssr_addr[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX];
-          always_comb dmv_write[RF_WRITE_PORT_IDX].packet.dmv_wdata = ssr_wdata[RF_WRITE_PORT_IDX];
+          always_comb cpu_dmv_write[RF_WRITE_PORT_IDX].valid = ssr_valid[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX];
+          always_comb ssr_ready[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX] = cpu_dmv_write[RF_WRITE_PORT_IDX].enable;
+          always_comb cpu_dmv_write[RF_WRITE_PORT_IDX].packet.address = ssr_addr[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX];
+          always_comb cpu_dmv_write[RF_WRITE_PORT_IDX].packet.data = ssr_wdata[RF_WRITE_PORT_IDX];
       end
+
+        initial begin
+        $display("NUM_RF_READ_PORT = %0d, NUM_RF_WRITE_PORT = %0d", NUM_RF_READ_PORT, NUM_RF_WRITE_PORT);
+        end
 
 
       // Memory request interface
-      val_ena_if#(.DTYPE(dmv_mem_req_dtype)) dmv_mem_req[NUM_AGU-1:0]();
-      assign obi_memory_data_if.req = dmv_mem_req[0].valid;
-      assign dmv_mem_req[0].enable = obi_memory_data_if.gnt;
-      assign obi_memory_data_if.addr = dmv_mem_req[0].packet.mem_addr;
-      assign obi_memory_data_if.wdata = dmv_mem_req[0].packet.mem_wdata;
-      assign obi_memory_data_if.we = dmv_mem_req[0].packet.mem_we;
-      assign obi_memory_data_if.be = dmv_mem_req[0].packet.mem_be;
+      val_ena_if#(.DTYPE(dmv_mem_packet_dtype)) dmv_mem[NUM_AGU-1:0]();
+      assign obi_memory_data_if.req = dmv_mem[0].valid;
+      assign dmv_mem[0].enable = obi_memory_data_if.gnt;
+      assign obi_memory_data_if.addr = dmv_mem[0].packet.address;
+      assign obi_memory_data_if.wdata = dmv_mem[0].packet.data;
+      assign obi_memory_data_if.we = dmv_mem[0].packet.we;
+      assign obi_memory_data_if.be = dmv_mem[0].packet.be;
 
       // Memory response interface
-      val_if#(.DTYPE(data_dtype)) dmv_mem_resp[NUM_AGU-1:0]();
-      always_comb dmv_mem_resp[0].valid = obi_memory_data_if.rvalid;
-      always_comb dmv_mem_resp[0].packet = obi_memory_data_if.rdata;
+      val_if#(.DTYPE(data_dtype)) mem_dmv[NUM_AGU-1:0]();
+      always_comb mem_dmv[0].valid = obi_memory_data_if.rvalid;
+      always_comb mem_dmv[0].packet = obi_memory_data_if.rdata;
 
+      localparam stream_addr_dtype LANE_ADDR[NUM_AGU-1:0] = '{5'd30};
 
-
-       sls_dmv i_sls_dmv
-       (
-         .dmv_std(dmv_std),
-         .dmv_enable(dmv_enable),
-         .dmv_config_req(dmv_config_req),
-         .dmv_config_resp(dmv_config_resp),
-         .dmv_read(dmv_read),
-         .dmv_write(dmv_write),
-         .dmv_mem_req(dmv_mem_req),
-         .dmv_mem_resp(dmv_mem_resp)
-       );
+      sls_dmv#(
+        .LANE_ADDR(LANE_ADDR)
+      ) i_sls_dmv (
+        .dmv_std(dmv_std),
+        .cpu_dmv_start_status(cpu_dmv_start_status),
+        .cpu_dmv_lsu_request(cpu_dmv_lsu_request),
+        .dmv_cpu_lsu_response(dmv_cpu_lsu_response),
+        .cpu_dmv_read(cpu_dmv_read),
+        .cpu_dmv_write(cpu_dmv_write),
+        .dmv_mem(dmv_mem),
+        .mem_dmv(mem_dmv)
+      );
 //---------------------------------------------------------------------------------
 
 
