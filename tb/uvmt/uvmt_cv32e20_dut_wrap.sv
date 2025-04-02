@@ -133,11 +133,11 @@ module uvmt_cv32e20_dut_wrap #(
     always_comb dmv_std.resetn = clknrst_if.reset_n;
 
     // Signals used for datamover integration
-    logic [NUM_RF_PORT-1:0] ssr_valid;
-    logic [NUM_RF_PORT-1:0] ssr_ready;
-    logic [NUM_RF_PORT-1:0][4:0] ssr_addr;
-    logic [NUM_RF_READ_PORT-1:0][31:0] ssr_rdata;
-    logic [NUM_RF_WRITE_PORT-1:0][31:0] ssr_wdata;
+    logic [NUM_RF_SSR_PORT-1:0] ssr_valid;
+    logic [NUM_RF_SSR_PORT-1:0] ssr_ready;
+    logic [NUM_RF_SSR_PORT-1:0][4:0] ssr_addr;
+    logic [NUM_RF_SSR_READ_PORT-1:0][31:0] ssr_rdata;
+    logic [31:0] ssr_wdata;
 
     logic data_req, data_gnt, data_rvalid, data_we;
     logic [31:0] data_addr, data_wdata, data_rdata;
@@ -271,26 +271,21 @@ module uvmt_cv32e20_dut_wrap #(
       always_comb data_rdata = dmv_cpu_lsu_response.packet;
 
       // Read interface 
-      val_ena_req_resp_if#(.DTYPE_REQ(stream_addr_dtype), .DTYPE_RESP(data_dtype)) cpu_dmv_read[NUM_RF_READ_PORT-1:0]();
-      for(genvar RF_READ_PORT_IDX = 0; RF_READ_PORT_IDX < NUM_RF_READ_PORT; RF_READ_PORT_IDX++) begin
-          always_comb cpu_dmv_read[RF_READ_PORT_IDX].valid = ssr_valid[RF_READ_PORT_IDX];
-          always_comb ssr_ready[RF_READ_PORT_IDX] = cpu_dmv_read[RF_READ_PORT_IDX].enable;
-          always_comb cpu_dmv_read[RF_READ_PORT_IDX].req_packet = ssr_addr[RF_READ_PORT_IDX];
-          always_comb ssr_rdata[RF_READ_PORT_IDX] = cpu_dmv_read[RF_READ_PORT_IDX].resp_packet;
+      val_ena_req_resp_if#(.DTYPE_REQ(stream_addr_dtype), .DTYPE_RESP(data_dtype)) cpu_dmv_read[NUM_RF_SSR_READ_PORT-1:0]();
+      for(genvar RF_SSR_READ_PORT_IDX = 0; RF_SSR_READ_PORT_IDX < NUM_RF_SSR_READ_PORT; RF_SSR_READ_PORT_IDX++) begin
+          always_comb cpu_dmv_read[RF_SSR_READ_PORT_IDX].valid = ssr_valid[RF_SSR_READ_PORT_IDX];
+          always_comb ssr_ready[RF_SSR_READ_PORT_IDX] = cpu_dmv_read[RF_SSR_READ_PORT_IDX].enable;
+          always_comb cpu_dmv_read[RF_SSR_READ_PORT_IDX].req_packet = ssr_addr[RF_SSR_READ_PORT_IDX];
+          always_comb ssr_rdata[RF_SSR_READ_PORT_IDX] = cpu_dmv_read[RF_SSR_READ_PORT_IDX].resp_packet;
       end
 
       // Write interface
-      val_ena_if#(.DTYPE(cpu_dmv_write_packet_dtype)) cpu_dmv_write[NUM_RF_WRITE_PORT-1:0]();
-      for(genvar RF_WRITE_PORT_IDX = 0; RF_WRITE_PORT_IDX < NUM_RF_WRITE_PORT; RF_WRITE_PORT_IDX++) begin
-          always_comb cpu_dmv_write[RF_WRITE_PORT_IDX].valid = ssr_valid[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX];
-          always_comb ssr_ready[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX] = cpu_dmv_write[RF_WRITE_PORT_IDX].enable;
-          always_comb cpu_dmv_write[RF_WRITE_PORT_IDX].packet.address = ssr_addr[NUM_RF_READ_PORT + RF_WRITE_PORT_IDX];
-          always_comb cpu_dmv_write[RF_WRITE_PORT_IDX].packet.data = ssr_wdata[RF_WRITE_PORT_IDX];
-      end
+      val_ena_if#(.DTYPE(cpu_dmv_write_packet_dtype)) cpu_dmv_write[NUM_WRITE_STREAM-1:0]();
+      always_comb cpu_dmv_write[0].valid = ssr_valid[NUM_RF_SSR_PORT-1];
+      always_comb ssr_ready[NUM_RF_SSR_PORT-1] = cpu_dmv_write[0].enable;
+      always_comb cpu_dmv_write[0].packet.address = ssr_addr[NUM_RF_SSR_PORT-1];
+      always_comb cpu_dmv_write[0].packet.data = ssr_wdata;
 
-        initial begin
-        $display("NUM_RF_READ_PORT = %0d, NUM_RF_WRITE_PORT = %0d", NUM_RF_READ_PORT, NUM_RF_WRITE_PORT);
-        end
 
 
       // Memory request interface
