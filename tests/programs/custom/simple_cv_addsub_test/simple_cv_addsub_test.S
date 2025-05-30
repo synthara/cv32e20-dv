@@ -447,4 +447,4 @@ _start_main:
     cv.subuNr    x12, x4, x5
     cv.addNr    x13, x2, x5
 end_test:
-    j end_test
+    wfi
