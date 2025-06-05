@@ -37,23 +37,32 @@ rem x29, x8, x20
 cv.sdotsp.sci.h x17, x30, 9
 cv.dotup.h x15, x8, x11
 c.mv x15, x17
-csrrwi x0, 0xA0, 0x1
+csrrwi x0, 0xA0, 0x6
 ori x27, x19, 664
 cv.dotup.h x19, x5, x15
+cv.dotup.h x19, x10, x15
 addi x10, x16, -1590
-cv.dotup.h x19, x5, x15
-cv.dotup.h x19, x5, x15
+cv.dotusp.h x15, x4, x13
+cv.dotusp.h x15, x5, x13
 cv.sdotup.sc.h x1, x4, x2
+cv.sdotup.sc.h x1, x11, x2
 c.mv x15, x17
-cv.dotup.h x15, x8, x11
-cv.dotsp.h x21, x8, x17
+cv.dotup.sci.h x8, x10, 12
+cv.dotup.sci.h x8, x7, 12
+cv.dotsp.h x21, x2, x17
+cv.dotsp.h x21, x6, x17
 cv.sdotsp.sci.h x17, x30, 9
+cv.sdotsp.sci.h x17, x12, 9
 cv.sdotusp.sc.h x2, x25, x20
+cv.sdotusp.sc.h x2, x24, x20
 mulh x3, x22, x11
-cv.dotsp.h x21, x8, x17
-cv.sdotsp.sci.h x17, x30, 9
-cv.sdotsp.sci.h x17, x30, 9
-cv.dotup.h x15, x8, x11
+cv.dotsp.sc.h x21, x8, x17
+cv.dotsp.sc.h x21, x14, x17
+cv.sdotsp.sci.h x17, x30, -15
+cv.sdotsp.sci.h x17, x10, -15
+cv.sdotusp.sc.h x15, x8, x11
+cv.sdotusp.sc.h x15, x14, x11
+csrrwi x0, 0xA0, 0x2
 cv.sdotup.sc.h x1, x4, x2
 cv.sdotsp.h x30, x2, x9
 rem x29, x8, x20
@@ -403,29 +412,38 @@ xori x0, x16, 819
 cv.dotusp.sci.h x27, x25, 24
 csrrwi x0, 0xA0, 0x1
 cv.sdotusp.sc.h x2, x8, x9
+cv.sdotusp.sc.h x2, x17, x9
 rem x29, x8, x20
-cv.sdotusp.sc.h x2, x8, x9
-c.nop
+cv.sdotsp.sc.h x13, x8, x14
+cv.sdotsp.sc.h x13, x12, x14
 ori x3, x25, 176
 c.mv x15, x17
-c.nop
-cv.sdotsp.sci.h x17, x30, 9
-cv.sdotusp.sc.h x2, x25, x20
+cv.sdotsp.sci.h x17, x8, -2
+cv.sdotsp.sci.h x17, x30, -2
+cv.dotusp.sc.h x2, x25, x20
+cv.dotusp.sc.h x2, x21, x20
 cv.dotup.h x15, x8, x11
+cv.dotup.h x15, x5, x11
 ori x3, x25, 176
 cv.sdotsp.h x30, x2, x9
-cv.sdotsp.sci.h x17, x30, 9
+cv.sdotsp.h x30, x15, x9
+cv.sdotsp.sci.h x17, x30, 28
+cv.sdotsp.sci.h x17, x20, 28
 cv.dotsp.h x4, x12, x16
-cv.sdotsp.sci.h x17, x30, 9
+cv.dotsp.h x4, x27, x16
 c.mv x15, x17
-cv.dotup.h x15, x8, x11
+cv.dotup.sci.h x15, x8, 17
+cv.dotup.sci.h x15, x28, 17
 mulh x3, x22, x11
 cv.sdotusp.sc.h x2, x25, x20
+cv.sdotusp.sc.h x2, x21, x20
 c.mv x15, x17
-cv.dotusp.h x3, x7, x6
 cv.dotusp.h x3, x7, x6
+cv.dotusp.h x3, x4, x6
 cv.dotsp.h x21, x8, x17
+cv.dotsp.h x21, x23, x17
 c.mv x15, x17
+csrrwi x0, 0xA0, 0x1
 cv.dotusp.sci.h x15, x8, 1
 cv.dotusp.h x3, x7, x6
 cv.sdotusp.sc.h x2, x25, x20
@@ -1341,40 +1359,47 @@ ori x27, x19, 664
 rem x29, x8, x20
 cv.dotsp.h x21, x8, x17
 cv.dotusp.sci.h x27, x25, 24
-csrrwi x0, 0xA0, 0x1
+csrrwi x0, 0xA0, 0x6
 xori x0, x16, 819
 ori x3, x25, 176
-cv.dotusp.sci.h x27, x25, 24
+cv.dotsp.sci.h x27, x25, 24
+cv.dotsp.sci.h x27, x19, 24
 cv.sdotup.sc.h x1, x4, x2
+cv.sdotup.sc.h x1, x14, x2
 cv.dotusp.h x3, x7, x6
+cv.dotusp.h x3, x17, x6
 cv.dotup.h x19, x5, x15
-cv.sdotusp.sc.h x2, x8, x9
+cv.dotup.h x19, x16, x15
 cv.sdotusp.sc.h x2, x8, x9
+cv.sdotusp.sc.h x2, x17, x9
 cv.dotusp.sci.h x27, x25, 24
+cv.dotusp.sci.h x27, x20, 24
 addi x10, x16, -1590
 cv.dotsp.h x21, x8, x17
+cv.dotsp.h x21, x16, x17
 ori x3, x25, 176
 rem x29, x8, x20
 cv.dotusp.h x3, x7, x6
+cv.dotusp.h x3, x18, x6
 csrrwi x0, 0xA0, 0x1
 mulh x3, x22, x11
-cv.dotsp.h x21, x8, x17
+cv.dotsp.sc.h x21, x8, x17
 cv.sdotsp.h x30, x2, x9
 cv.dotusp.sci.h x27, x25, 24
 cv.dotusp.sci.h x27, x25, 24
 c.nop
 cv.dotup.h x19, x5, x15
 cv.dotusp.h x3, x7, x6
-cv.dotusp.sci.h x15, x8, 1
+cv.dotsp.sc.h x15, x8, x10
 c.mv x15, x17
 c.mv x15, x17
 c.nop
 ori x3, x25, 176
 addi x10, x16, -1590
-csrrwi x0, 0xA0, 0x1
+csrrwi x0, 0xA0, 0x2
 cv.sdotusp.sc.h x2, x25, x20
 c.mv x15, x17
-cv.dotsp.h x21, x8, x17
+cv.dotsp.sc.h x21, x8, x17
 cv.dotup.h x19, x5, x15
 rem x29, x8, x20
 cv.sdotsp.h x30, x2, x9
@@ -1388,10 +1413,10 @@ addi x10, x16, -1590
 cv.sdotusp.sc.h x2, x25, x20
 cv.sdotsp.h x30, x2, x9
 mulh x3, x22, x11
-cv.sdotusp.sc.h x2, x8, x9
-cv.sdotusp.sc.h x2, x25, x20
+cv.dotusp.sc.h x2, x8, x9
+cv.dotsp.sc.h x2, x25, x20
 cv.sdotup.sc.h x1, x4, x2
-cv.sdotusp.sc.h x2, x8, x9
+cv.sdotup.sc.h x2, x8, x9
 cv.sdotsp.sci.h x17, x30, 9
 cv.dotsp.h x4, x12, x16
 cv.dotusp.sci.h x15, x8, 1
@@ -1739,10 +1764,11 @@ cv.dotup.h x19, x5, x15
 ori x27, x19, 664
 xori x0, x16, 819
 cv.sdotsp.sci.h x17, x30, 9
-csrrwi x0, 0xA0, 0x1
+csrrwi x0, 0xA0, 0x6
 cv.dotup.h x19, x5, x15
-cv.dotsp.h x4, x12, x16
-cv.dotsp.h x4, x12, x16
+cv.dotup.h x19, x10, x15
+cv.sdotusp.sci.h x4, x12, -32
+cv.sdotusp.sci.h x4, x11, -32
 ori x3, x25, 176
 csrrwi x0, 0xA0, 0x1
 c.mv x15, x17
@@ -1932,14 +1958,14 @@ c.nop
 cv.sdotup.sc.h x1, x4, x2
 cv.sdotusp.sc.h x2, x8, x9
 c.nop
-csrrwi x0, 0xA0, 0x2
+csrrwi x0, 0xA0, 0x6
 addi x10, x16, -1590
 ori x27, x19, 664
 cv.dotsp.h x4, x12, x16
-csrrwi x0, 0xA0, 0x2
-csrrwi x0, 0xA0, 0x2
+cv.dotsp.h x4, x14, x16
 mulh x3, x22, x11
 cv.dotusp.sci.h x15, x8, 1
+cv.dotusp.sci.h x15, x7, 1
 csrrwi x0, 0xA0, 0x1
 cv.dotusp.sci.h x15, x8, 1
 cv.dotsp.h x21, x8, x17
@@ -3160,10 +3186,14 @@ mulh x3, x22, x11
 cv.sdotsp.sci.h x17, x30, 9
 csrrwi x0, 0xA0, 0x2
 c.mv x15, x17
-cv.dotup.h x15, x8, x11
+cv.dotup.sc.h x15, x4, x11
+cv.dotup.sc.h x15, x8, x11
 cv.dotusp.sci.h x27, x25, 24
+cv.dotusp.sci.h x27, x12, 24
 cv.dotusp.h x3, x7, x6
+cv.dotusp.h x3, x8, x6
 cv.sdotsp.h x30, x2, x9
+cv.sdotsp.h x30, x21, x9
 csrrwi x0, 0xA0, 0x2
 ori x3, x25, 176
 rem x29, x8, x20
@@ -3603,16 +3633,19 @@ cv.sdotsp.h x30, x2, x9
 ori x27, x19, 664
 xori x0, x16, 819
 cv.sdotusp.sc.h x2, x25, x20
-csrrwi x0, 0xA0, 0x1
 c.nop
 mulh x3, x22, x11
 c.nop
 addi x10, x16, -1590
 csrrwi x0, 0xA0, 0x1
-cv.dotusp.sci.h x15, x8, 1
-cv.dotup.h x15, x8, x11
-cv.sdotup.sc.h x1, x4, x2
-cv.dotup.h x15, x8, x11
+cv.dotusp.sci.h x15, x8, 10
+cv.dotusp.sci.h x15, x12, 10
+cv.sdotup.sc.h x15, x8, x11
+cv.sdotup.sc.h x15, x10, x11
+cv.sdotusp.sc.h x1, x8, x2
+cv.sdotusp.sc.h x1, x4, x2
+cv.sdotsp.sc.h x15, x8, x11
+cv.sdotsp.sc.h x15, x24, x11
 ori x3, x25, 176
 c.mv x15, x17
 csrrwi x0, 0xA0, 0x1
@@ -5246,8 +5279,9 @@ mulh x3, x22, x11
 mulh x3, x22, x11
 cv.dotusp.h x3, x7, x6
 cv.dotsp.h x4, x12, x16
-csrrwi x0, 0xA0, 0x1
-cv.dotusp.sci.h x15, x8, 1
+csrrwi x0, 0xA0, 0x6
+cv.dotusp.sci.h x15, x8, -12
+cv.dotusp.sci.h x15, x4, -12
 csrrwi x0, 0xA0, 0x1
 cv.dotusp.h x3, x7, x6
 cv.sdotusp.sc.h x2, x8, x9
@@ -5871,10 +5905,13 @@ rem x29, x8, x20
 cv.sdotusp.sc.h x2, x25, x20
 ori x3, x25, 176
 cv.sdotup.sc.h x1, x4, x2
-csrrwi x0, 0xA0, 0x1
+csrrwi x0, 0xA0, 0x6
 cv.dotsp.h x21, x8, x17
+cv.dotsp.h x21, x15, x17
 cv.sdotup.sc.h x1, x4, x2
-cv.dotsp.h x4, x12, x16
+cv.sdotup.sc.h x1, x17, x2
+cv.dotusp.h x4, x27, x16
+cv.dotusp.h x4, x12, x16
 csrrwi x0, 0xA0, 0x1
 c.nop
 csrrwi x0, 0xA0, 0x1
@@ -7485,16 +7522,18 @@ cv.sdotup.sc.h x1, x4, x2
 cv.dotusp.sci.h x27, x25, 24
 cv.sdotusp.sc.h x2, x25, x20
 cv.sdotsp.h x30, x2, x9
-csrrwi x0, 0xA0, 0x1
+csrrwi x0, 0xA0, 0x6
 c.mv x15, x17
 rem x29, x8, x20
 ori x3, x25, 176
 c.mv x15, x17
 mulh x3, x22, x11
 cv.dotusp.h x3, x7, x6
+cv.dotusp.h x3, x2, x6
 cv.sdotup.sc.h x1, x4, x2
-csrrwi x0, 0xA0, 0x2
-cv.dotsp.h x21, x8, x17
+cv.sdotup.sc.h x1, x17, x2
+cv.sdotsp.sci.h x21, x8, -14
+cv.sdotsp.sci.h x21, x8, -14
 csrrwi x0, 0xA0, 0x2
 cv.dotusp.sci.h x27, x25, 24
 cv.sdotsp.h x30, x2, x9
@@ -8719,9 +8758,11 @@ rem x29, x8, x20
 cv.dotsp.h x21, x8, x17
 ori x27, x19, 664
 cv.dotusp.sci.h x15, x8, 1
-csrrwi x0, 0xA0, 0x2
-cv.dotsp.h x4, x12, x16
-cv.sdotsp.h x30, x2, x9
+csrrwi x0, 0xA0, 0x6
+cv.dotsp.sci.h x4, x12, -1
+cv.dotsp.sci.h x4, x11, -1
+cv.sdotsp.sc.h x30, x2, x9
+cv.sdotsp.sc.h x30, x2, x9
 csrrwi x0, 0xA0, 0x2
 addi x10, x16, -1590
 ori x3, x25, 176
@@ -9427,11 +9468,14 @@ ori x27, x19, 664
 cv.sdotsp.h x30, x2, x9
 cv.dotsp.h x4, x12, x16
 cv.dotup.h x19, x5, x15
-csrrwi x0, 0xA0, 0x1
+csrrwi x0, 0xA0, 0x6
 cv.dotusp.h x3, x7, x6
+cv.dotusp.h x3, x2, x6
 addi x10, x16, -1590
-cv.dotusp.sci.h x27, x25, 24
+cv.sdotusp.sci.h x27, x25, 24
+cv.sdotusp.sci.h x27, x2, 24
 cv.sdotusp.sc.h x2, x25, x20
+cv.sdotusp.sc.h x2, x21, x20
 ori x3, x25, 176
 csrrwi x0, 0xA0, 0x2
 mulh x3, x22, x11
@@ -9962,14 +10006,18 @@ cv.sdotusp.sc.h x2, x8, x9
 ori x3, x25, 176
 cv.dotup.h x19, x5, x15
 cv.sdotusp.sc.h x2, x25, x20
-csrrwi x0, 0xA0, 0x2
+csrrwi x0, 0xA0, 0x6
 cv.sdotup.sc.h x1, x4, x2
+cv.sdotup.sc.h x1, x17, x2
 cv.sdotusp.sc.h x2, x8, x9
+cv.sdotusp.sc.h x2, x10, x9
 c.mv x15, x17
 c.nop
 cv.dotusp.sci.h x15, x8, 1
-cv.dotsp.h x4, x12, x1
-csrrwi x0, 0xA0, 0x2
+cv.dotusp.sci.h x15, x7, 1
+cv.dotsp.h x4, x12, x16
+cv.dotsp.h x4, x13, x16
+csrrwi x0, 0xA0, 0x1
 cv.dotusp.sci.h x15, x8, 1
 cv.sdotsp.sci.h x17, x30, 9
 ori x3, x25, 176
