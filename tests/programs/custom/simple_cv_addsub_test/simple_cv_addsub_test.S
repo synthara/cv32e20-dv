@@ -8,16 +8,16 @@ _start:
 .section .text
 _start_main:
 
-    # Initialization with random e edge-case
-    li x1,  0x00000010     # Positivo
-    li x2,  0xFFFFFFF0     # Negativo grande
-    li x3,  0x00000000     # Zero
-    li x4,  0x7FFFFFFF     # Positivo max 32-bit
-    li x5,  0x80000000     # Negativo min 32-bit
-    li x6,  0x00000001     # +1
-    li x7,  0xFFFFFFFF     # -1 (signed)
-    li x8,  0x0000001F     # 31 → test shift massimo
-    li x9,  0x00000020     # 32 → dovrebbe diventare shift 0
+
+    li x1,  0x00000010     
+    li x2,  0xFFFFFFF0     
+    li x3,  0x00000000     
+    li x4,  0x7FFFFFFF     
+    li x5,  0x80000000     
+    li x6,  0x00000001     
+    li x7,  0xFFFFFFFF     
+    li x8,  0x0000001F     
+    li x9,  0x00000020     
 
     csrrwi      x0, 0xA0, 0x3
 
