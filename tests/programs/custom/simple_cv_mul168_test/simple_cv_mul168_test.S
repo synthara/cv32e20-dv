@@ -7057,7 +7057,7 @@ _start_main:
     c.mv x14, x11
     cv.mulhhuN x28, x20, x9, 2
     divu x25, x9, x19
-    cv.mulsN x17, x17, x9, 3
+    cv.mulsN x17, x18, x9, 3
     c.sub x13, x15
     andi x12, x21, 187
     mulhsu x5, x20, x12
@@ -10036,4 +10036,4 @@ _start_main:
     andi x31, x27, 1103
     cv.mulsN x7, x22, x17, 22
     cv.mulhhsN x28, x12, x3, 1
-    wfi
+    j _test_pass

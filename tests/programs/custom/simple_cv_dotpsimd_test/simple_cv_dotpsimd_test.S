@@ -10051,4 +10051,4 @@ cv.sdotsp.h x30, x2, x9
 cv.dotusp.sci.h x15, x8, 1
 cv.sdotusp.sc.h x2, x25, x20
 cv.sdotusp.sc.h x2, x25, x20
-wfi
+j _test_pass

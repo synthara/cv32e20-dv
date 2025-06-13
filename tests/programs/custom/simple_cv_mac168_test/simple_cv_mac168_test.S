@@ -10040,4 +10040,4 @@ _start_main:
     c.li x13, 3
     c.li x11, -8
     mulh x16, x21, x17
-    wfi
+    j _test_pass

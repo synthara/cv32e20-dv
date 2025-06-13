@@ -866,4 +866,4 @@ div x6, x1, x8
 div x18, x3, x22
 cv.cmple.h x21, x10, x17
 ori x29, x21, -1737
-wfi
+j _test_pass

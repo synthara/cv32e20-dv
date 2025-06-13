@@ -10009,4 +10009,4 @@ _start_main:
     cv.avg.h x21, x16, x25
     cv.sll.h x6, x2, x25
     cv.min.h x26, x30, x2
-    wfi
+    j _test_pass

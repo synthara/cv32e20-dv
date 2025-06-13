@@ -1071,4 +1071,4 @@ _start_main:
     div x7, x20, x7
     div x18, x1, x13
     cv.mac x1, x17, x22
-    wfi
+    j _test_pass

@@ -9991,4 +9991,4 @@ cv.maxu x5, x21, x15
 cv.sle x23, x28, x2
 c.nop
 mulh x2, x24, x4
-wfi
+j _test_pass

@@ -1515,4 +1515,4 @@ cv.clip x31, x20, 30
 mul x3, x4, x5
 cv.clipu x26, x23, 4
 cv.clip x10, x12, 25
-wfi
+j _test_pass
