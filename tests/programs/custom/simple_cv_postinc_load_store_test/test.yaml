@@ -1,0 +1,4 @@
+name: simple_cv_postinc_load_store_test
+uvm_test: uvmt_$(CV_CORE_LC)_firmware_test_c
+description: >
+    First simple test of cv_postinc_load_store instructions
