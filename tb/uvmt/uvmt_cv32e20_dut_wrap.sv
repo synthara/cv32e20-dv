@@ -102,86 +102,124 @@ module uvmt_cv32e20_dut_wrap #(
     assign interrupt_if.clk                     = clknrst_if.clk;
     assign interrupt_if.reset_n                 = clknrst_if.reset_n;
     assign irq_uvma                             = interrupt_if.irq;
-    assign interrupt_if.irq_id                  = cv32e20_top_i.u_cve2_top.u_cve2_core.id_stage_i.controller_i.exc_cause_o[4:0]; //irq_id;
+    //assign interrupt_if.irq_id                  = cv32e20_top_i.u_cve2_top.u_cve2_core.id_stage_i.controller_i.exc_cause_o[4:0]; //irq_id;
 //    assign interrupt_if.irq_ack                 = cv32e20_top_i.u_cve2_top.u_cve2_core.id_stage_i.controller_i.handle_irq; //irq_ack;
-    assign interrupt_if.irq_ack                 = (cv32e20_top_i.u_cve2_top.u_cve2_core.id_stage_i.controller_i.ctrl_fsm_cs == 4'h7);//irq_ack
+   // assign interrupt_if.irq_ack                 = (cv32e20_top_i.u_cve2_top.u_cve2_core.id_stage_i.controller_i.ctrl_fsm_cs == 4'h7);//irq_ack
 
     assign vp_interrupt_if.clk                  = clknrst_if.clk;
     assign vp_interrupt_if.reset_n              = clknrst_if.reset_n;
     assign irq_vp                               = irq_uvma;
     // {irq_q[31:16], pending_enabled_irq_q[11], pending_enabled_irq_q[3], pending_enabled_irq_q[7]}
     // was vp_interrupt_if.irq;
-    assign vp_interrupt_if.irq_id               = cv32e20_top_i.u_cve2_top.u_cve2_core.id_stage_i.controller_i.exc_cause_o[4:0];    //irq_id;
-    assign vp_interrupt_if.irq_ack              = (cv32e20_top_i.u_cve2_top.u_cve2_core.id_stage_i.controller_i.ctrl_fsm_cs == 4'h7);//irq_ack
+    //assign vp_interrupt_if.irq_ack              = (cv32e20_top_i.u_cve2_top.u_cve2_core.id_stage_i.controller_i.ctrl_fsm_cs == 4'h7);//irq_ack
 
     assign irq = irq_uvma | irq_vp;
 
     // ------------------------------------------------------------------------
     // Instantiate the core
 //    cve2_top #(
-    cve2_top_tracing #(
-               .MHPMCounterNum   (MHPMCounterNum),
-               .MHPMCounterWidth (MHPMCounterWidth),
-               .RV32E            (RV32E),
-               .RV32M            (RV32M),
-               .DmHaltAddr       (DmHaltAddr),
-               .DmExceptionAddr  (DmExceptionAddr)
-              )
-    cv32e20_top_i
-        (
-         .clk_i                  ( clknrst_if.clk                 ),
-         .rst_ni                 ( clknrst_if.reset_n             ),
+//     cve2_top_tracing #(
+//                .MHPMCounterNum   (MHPMCounterNum),
+//                .MHPMCounterWidth (MHPMCounterWidth),
+//                .RV32E            (RV32E),
+//                .RV32M            (RV32M),
+//                .DmHaltAddr       (DmHaltAddr),
+//                .DmExceptionAddr  (DmExceptionAddr)
+//               )
+//     cv32e20_top_i
+//         (
+//          .clk_i                  ( clknrst_if.clk                 ),
+//          .rst_ni                 ( clknrst_if.reset_n             ),
 
-         .test_en_i              ( 1'b1                           ), // enable all clock gates for testing
-         .ram_cfg_i              ( prim_ram_1p_pkg::RAM_1P_CFG_DEFAULT ),
+//          .test_en_i              ( 1'b1                           ), // enable all clock gates for testing
+//          .ram_cfg_i              ( prim_ram_1p_pkg::RAM_1P_CFG_DEFAULT ),
 
-         .hart_id_i              ( 32'h0000_0000                  ),
-         .boot_addr_i            ( core_cntrl_if.boot_addr       ), //<---MJS changing to 0
+//          .hart_id_i              ( 32'h0000_0000                  ),
+//          .boot_addr_i            ( core_cntrl_if.boot_addr       ), //<---MJS changing to 0
 
-  // Instruction memory interface
-         .instr_req_o            ( obi_memory_instr_if.req        ), // core to agent
-         .instr_gnt_i            ( obi_memory_instr_if.gnt        ), // agent to core
-         .instr_rvalid_i         ( obi_memory_instr_if.rvalid     ),
-         .instr_addr_o           ( obi_memory_instr_if.addr       ),
-         .instr_rdata_i          ( obi_memory_instr_if.rdata      ),
-         .instr_err_i            ( '0                             ),
+//   // Instruction memory interface
+//          .instr_req_o            ( obi_memory_instr_if.req        ), // core to agent
+//          .instr_gnt_i            ( obi_memory_instr_if.gnt        ), // agent to core
+//          .instr_rvalid_i         ( obi_memory_instr_if.rvalid     ),
+//          .instr_addr_o           ( obi_memory_instr_if.addr       ),
+//          .instr_rdata_i          ( obi_memory_instr_if.rdata      ),
+//          .instr_err_i            ( '0                             ),
 
-  // Data memory interface
-         .data_req_o             ( obi_memory_data_if.req         ),
-         .data_gnt_i             ( obi_memory_data_if.gnt         ),
-         .data_rvalid_i          ( obi_memory_data_if.rvalid      ),
-         .data_we_o              ( obi_memory_data_if.we          ),
-         .data_be_o              ( obi_memory_data_if.be          ),
-         .data_addr_o            ( obi_memory_data_if.addr        ),
-         .data_wdata_o           ( obi_memory_data_if.wdata       ),
-         .data_rdata_i           ( obi_memory_data_if.rdata       ),
-         .data_err_i             ( '0                             ),
+//   // Data memory interface
+//          .data_req_o             ( obi_memory_data_if.req         ),
+//          .data_gnt_i             ( obi_memory_data_if.gnt         ),
+//          .data_rvalid_i          ( obi_memory_data_if.rvalid      ),
+//          .data_we_o              ( obi_memory_data_if.we          ),
+//          .data_be_o              ( obi_memory_data_if.be          ),
+//          .data_addr_o            ( obi_memory_data_if.addr        ),
+//          .data_wdata_o           ( obi_memory_data_if.wdata       ),
+//          .data_rdata_i           ( obi_memory_data_if.rdata       ),
+//          .data_err_i             ( '0                             ),
 
-  // Interrupt inputs
-         .irq_software_i         ( irq_uvma[3]),
-         .irq_timer_i            ( irq_uvma[7]),
-         .irq_external_i         ( irq_uvma[11]),
-         .irq_fast_i             ( irq_uvma[31:16]),
-         .irq_nm_i               ( irq_uvma[0]),       // non-maskeable interrupt
+//   // Interrupt inputs
+//          .irq_software_i         ( irq_uvma[3]),
+//          .irq_timer_i            ( irq_uvma[7]),
+//          .irq_external_i         ( irq_uvma[11]),
+//          .irq_fast_i             ( irq_uvma[31:16]),
+//          .irq_nm_i               ( irq_uvma[0]),       // non-maskeable interrupt
 
-  // Debug Interface
-         .debug_req_i             (debug_req_uvma),
-         .crash_dump_o            (),
+//   // Debug Interface
+//          .debug_req_i             (debug_req_uvma),
+//          .crash_dump_o            (),
 
-  // RISC-V Formal Interface
-  // Does not comply with the coding standards of _i/_o suffixes, but follows
-  // the convention of RISC-V Formal Interface Specification.
-  // CPU Control Signals
-         .fetch_enable_i          (core_cntrl_if.fetch_en), // fetch_enable_t
-         .core_sleep_o            ()
-        );
+//   // RISC-V Formal Interface
+//   // Does not comply with the coding standards of _i/_o suffixes, but follows
+//   // the convention of RISC-V Formal Interface Specification.
+//   // CPU Control Signals
+//          .fetch_enable_i          (core_cntrl_if.fetch_en), // fetch_enable_t
+//          .core_sleep_o            ()
+//         );
+
+cve_cor_wrp cv32e20_top_i( // Put the same instance name of the rtl so that nothing has to be changed in the tb
+       .clk(clknrst_if.clk),
+       .resetn(clknrst_if.reset_n),
+       .test_en_i('1),
+       .ram_cfg_i('0),
+       .ram_cfg_en_i('0), 
+       .rf_cfg_en_i('0),
+       .rf_cfg_i('0),
+       .hart_id_i('0),
+       .boot_addr_i(core_cntrl_if.boot_addr), 
+       .instr_req_o(obi_memory_instr_if.req),
+       .instr_gnt_i(obi_memory_instr_if.gnt),
+       .instr_rvalid_i(obi_memory_instr_if.rvalid),
+       .instr_addr_o(obi_memory_instr_if.addr),
+       .instr_rdata_i(obi_memory_instr_if.rdata), 
+       .instr_err_i('0),
+       .data_req_o(obi_memory_data_if.req),
+       .data_gnt_i(obi_memory_data_if.gnt),
+       .data_rvalid_i(obi_memory_data_if.rvalid),
+       .data_we_o(obi_memory_data_if.we), 
+       .data_be_o(obi_memory_data_if.be),
+       .data_addr_o(obi_memory_data_if.addr),
+       .data_wdata_o(obi_memory_data_if.wdata),
+       .data_rdata_i(obi_memory_data_if.rdata),
+       .data_err_i('0),
+       .irq_software_i(irq_uvma[3]),
+       .irq_timer_i(irq_uvma[7]),
+       .irq_external_i(irq_uvma[11]),
+       .irq_fast_i(irq_uvma[31:16]),
+       .irq_nm_i(irq_uvma[0]), 
+       .debug_req_i(debug_req_uvma),
+       .current_pc(),
+       .next_pc(),
+       .last_data_addr(),
+       .exception_addr(), 
+       .fetch_enable_i(core_cntrl_if.fetch_en),
+       .core_sleep_o()
+);
 
 
 
 `define RVFI_INSTR_PATH rvfi_instr_if
 `define RVFI_CSR_PATH   rvfi_csr_if
 `define DUT_PATH        cv32e20_top_i
-`define CSR_PATH        `DUT_PATH.u_cve2_top.u_cve2_core.cs_registers_i
+//`define CSR_PATH        `DUT_PATH.u_cve2_top.u_cve2_core.cs_registers_i
 
 
 endmodule : uvmt_cv32e20_dut_wrap
