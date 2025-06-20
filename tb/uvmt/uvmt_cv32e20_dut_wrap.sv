@@ -116,19 +116,30 @@ module uvmt_cv32e20_dut_wrap #(
 
     assign irq = irq_uvma | irq_vp;
 
-
-
 //---------------------------------------------------------------------------------
-    rvv_cv_x_if cv_x_if_issue();
-    rvv_cv_x_if cv_x_if_register();
-    rvv_cv_x_if cv_x_if_commit();
-    rvv_cv_x_if cv_x_if_result();
-    status_if#(.DTYPE(data_csr_dtype)) csr_vec_mode();
+    // CV-X-IF intermediate signals
+    logic          x_issue_valid;
+    logic          x_issue_ready;
+    x_issue_req_t  x_issue_req;
+    x_issue_resp_t x_issue_resp;
 
-    snt_std_if xcs_std();
+    // Register Interface   
+    x_register_t   x_register;
+
+    // Commit Interface   
+    logic          x_commit_valid;
+    x_commit_t     x_commit;
+
+    // Result Interface   
+    logic          x_result_valid;
+    logic          x_result_ready;
+    x_result_t     x_result;
+
+    // CSR vec mode
+    logic          csr_vec_mode;
+
+    // DMV intermediate signals
     snt_std_if dmv_std();
-    always_comb xcs_std.clk = clknrst_if.clk;
-    always_comb xcs_std.resetn = clknrst_if.reset_n;
     always_comb dmv_std.clk = clknrst_if.clk;   
     always_comb dmv_std.resetn = clknrst_if.reset_n;
 
@@ -143,12 +154,8 @@ module uvmt_cv32e20_dut_wrap #(
     logic [31:0] data_addr, data_wdata, data_rdata;
     logic [3:0] data_be;
 
-    logic [31:0] csr_ssr_cfg;
+    logic [31:0] csr_ssr_start;
 //---------------------------------------------------------------------------------
-
-
-
-
 
 // --------------------------------------------------------------------------------
     // Instantiate the core
@@ -159,71 +166,84 @@ module uvmt_cv32e20_dut_wrap #(
                .RV32E            (RV32E),
                .RV32M            (RV32M),
                .DmHaltAddr       (DmHaltAddr),
-               .DmExceptionAddr  (DmExceptionAddr)
+               .DmExceptionAddr  (DmExceptionAddr),
+               .XInterface       (1'b1)
               )
     cv32e20_top_i
         (
-         .clk_i                  ( clknrst_if.clk                 ),
-         .rst_ni                 ( clknrst_if.reset_n             ),
+         .clk_i                  ( clknrst_if.clk                      ),
+         .rst_ni                 ( clknrst_if.reset_n                  ),
 
-         .test_en_i              ( 1'b1                           ), // enable all clock gates for testing
+         .test_en_i              ( 1'b1                                ), // enable all clock gates for testing
          .ram_cfg_i              ( prim_ram_1p_pkg::RAM_1P_CFG_DEFAULT ),
 
-         .hart_id_i              ( 32'h0000_0000                  ),
-         .boot_addr_i            ( core_cntrl_if.boot_addr       ), //<---MJS changing to 0
+         .hart_id_i              ( 32'h0000_0000                       ),
+         .boot_addr_i            ( core_cntrl_if.boot_addr             ), //<---MJS changing to 0
 
          // Instruction memory interface
-         .instr_req_o            ( obi_memory_instr_if.req        ), // core to agent
-         .instr_gnt_i            ( obi_memory_instr_if.gnt        ), // agent to core
-         .instr_rvalid_i         ( obi_memory_instr_if.rvalid     ),
-         .instr_addr_o           ( obi_memory_instr_if.addr       ),
-         .instr_rdata_i          ( obi_memory_instr_if.rdata      ),
-         .instr_err_i            ( '0                             ),
+         .instr_req_o            ( obi_memory_instr_if.req             ), // core to agent
+         .instr_gnt_i            ( obi_memory_instr_if.gnt             ), // agent to core
+         .instr_rvalid_i         ( obi_memory_instr_if.rvalid          ),
+         .instr_addr_o           ( obi_memory_instr_if.addr            ),
+         .instr_rdata_i          ( obi_memory_instr_if.rdata           ),
+         .instr_err_i            ( '0                                  ),
 
          // Data memory interface
-         .data_req_o             ( data_req                       ),
-         .data_gnt_i             ( data_gnt                       ),
-         .data_rvalid_i          ( data_rvalid                    ),
-         .data_we_o              ( data_we                        ),
-         .data_be_o              ( data_be                        ),
-         .data_addr_o            ( data_addr                      ), 
-         .data_wdata_o           ( data_wdata                     ),
-         .data_rdata_i           ( data_rdata                     ),
-         .data_err_i             ( '0                             ),
+         .data_req_o             ( data_req                            ),
+         .data_gnt_i             ( data_gnt                            ),
+         .data_rvalid_i          ( data_rvalid                         ),
+         .data_we_o              ( data_we                             ),
+         .data_be_o              ( data_be                             ),
+         .data_addr_o            ( data_addr                           ), 
+         .data_wdata_o           ( data_wdata                          ),
+         .data_rdata_i           ( data_rdata                          ),
+         .data_err_i             ( '0                                  ),
 
 //---------------------------------------------------------------------------------
-         // CV-X-IF.
-         // Issue interface.
-         .xcs_cv_x_if_issue(cv_x_if_issue),
-         // Register interface.
-         .xcs_cv_x_if_register(cv_x_if_register),
-         // Commit interface.
-         .xcs_cv_x_if_commit(cv_x_if_commit),
-         // Result interface.  
-         .xcs_cv_x_if_result(cv_x_if_result),
-         // CSR vec mode.
-         .csr_vec_mode(csr_vec_mode),
+
+         // Core-V eXtension Interface
+         // Issue Interface
+         .x_issue_valid_o        ( x_issue_valid                       ),
+         .x_issue_ready_i        ( x_issue_ready                       ),
+         .x_issue_req_o          ( x_issue_req                         ),
+         .x_issue_resp_i         ( x_issue_resp                        ),
+
+         // Register Interface   
+         .x_register_o           ( x_register                          ),
+
+         // Commit Interface   
+         .x_commit_valid_o       ( x_commit_valid                      ),
+         .x_commit_o             ( x_commit                            ),
+
+         // Result Interface   
+         .x_result_valid_i       ( x_result_valid                      ),
+         .x_result_ready_o       ( x_result_ready                      ),
+         .x_result_i             ( x_result                            ),
+
+         // CSR vec mode
+         .csr_vec_mode_o         ( csr_vec_mode                        ),
+  //---------------------------------------------------------------------------------
 
          // SSR interfaces
-         .ssr_valid_o(ssr_valid),
-         .ssr_ready_i(ssr_ready),
-         .ssr_addr_o(ssr_addr),
-         .ssr_rdata_i(ssr_rdata),
-         .ssr_wdata_o(ssr_wdata),
+         .ssr_valid_o            ( ssr_valid                           ),
+         .ssr_ready_i            ( ssr_ready                           ),
+         .ssr_addr_o             ( ssr_addr                            ),
+         .ssr_rdata_i            ( ssr_rdata                           ),
+         .ssr_wdata_o            ( ssr_wdata                           ),
 
          // SSR config CSR register 
-         .csr_ssr_cfg_o(csr_ssr_cfg),
+         .csr_ssr_start_o        ( csr_ssr_start                         ),
 //---------------------------------------------------------------------------------
 
          // Interrupt inputs
-         .irq_software_i         ( irq_uvma[3]),
-         .irq_timer_i            ( irq_uvma[7]),
-         .irq_external_i         ( irq_uvma[11]),
-         .irq_fast_i             ( irq_uvma[31:16]),
-         .irq_nm_i               ( irq_uvma[0]),       // non-maskeable interrupt
+         .irq_software_i         ( irq_uvma[3]                         ),
+         .irq_timer_i            ( irq_uvma[7]                         ),
+         .irq_external_i         ( irq_uvma[11]                        ),
+         .irq_fast_i             ( irq_uvma[31:16]                     ),
+         .irq_nm_i               ( irq_uvma[0]                         ),       // non-maskeable interrupt
 
          // Debug Interface
-         .debug_req_i             (debug_req_uvma),
+         .debug_req_i             (debug_req_uvma                      ),
          .crash_dump_o            (),
 
          // RISC-V Formal Interface
@@ -231,30 +251,48 @@ module uvmt_cv32e20_dut_wrap #(
          // the convention of RISC-V Formal Interface Specification.
          // CPU Control Signals
 
-         .fetch_enable_i          (core_cntrl_if.fetch_en), // fetch_enable_t
+         .fetch_enable_i          (core_cntrl_if.fetch_en              ), // fetch_enable_t
          .core_sleep_o            ()
         );
 
-
-
-
 //---------------------------------------------------------------------------------
-      // Coporcessor instance
-       rvv_xcs i_rvv_xcs
-       (
-         .xcs_std(xcs_std),
-         .xcs_cv_x_if_issue(cv_x_if_issue),
-         .xcs_cv_x_if_register(cv_x_if_register),
-         .xcs_cv_x_if_commit(cv_x_if_commit),
-         .xcs_cv_x_if_result(cv_x_if_result),
-         .csr_vec_mode(csr_vec_mode)
-       );
+      // Coprocessor instance
+       rvv_xcs_wrp i_rvv_xcs_wrp
+         (
+          // std if signals
+          .clk(clknrst_if.clk),
+          .resetn(clknrst_if.reset_n),
+
+          // CV-X-IF Issue interface signals.
+          .issue_valid(x_issue_valid),
+          .issue_ready(x_issue_ready),
+          .issue_req_flatten(x_issue_req),
+          .issue_resp_flatten(x_issue_resp),
+
+          // CV-X-IF Register interface signals.
+          .register_valid(),
+          .register_ready(),
+          .register_flatten(x_register),
+
+          // CV-X-IF Commit interface signals.
+          .commit_valid(x_commit_valid),
+          .commit_flatten(x_commit),
+
+          // CV-X-IF Result interface signals.
+          .result_ready(x_result_ready),
+          .result_valid(x_result_valid),
+          .result_flatten(x_result),
+
+          //CSR vec mode.
+          .csr_vec_mode_flatten(csr_vec_mode)
+         );
+
 //---------------------------------------------------------------------------------
       // Datamover instance
 
       // Enable interface
       status_if#(.DTYPE(cpu_dmv_start_status_dtype)) cpu_dmv_start_status();
-      always_comb cpu_dmv_start_status.packet = csr_ssr_cfg[NUM_AGU-1:0];
+      always_comb cpu_dmv_start_status.packet = csr_ssr_start[NUM_AGU-1:0];
 
       // Config request interface
       val_ena_if#(.DTYPE(cpu_dmv_lsu_request_packet_dtype)) cpu_dmv_lsu_request();
@@ -317,8 +355,6 @@ module uvmt_cv32e20_dut_wrap #(
         .mem_dmv(mem_dmv)
       );
 //---------------------------------------------------------------------------------
-
-
 
 `define RVFI_INSTR_PATH rvfi_instr_if
 `define RVFI_CSR_PATH   rvfi_csr_if
