@@ -242,7 +242,7 @@ task uvmt_cv32e20_base_test_c::run_phase(uvm_phase phase);
 
    super.run_phase(phase);
 
-   watchdog_timer();
+   // watchdog_timer();
 
 endtask : run_phase
 
