@@ -136,7 +136,7 @@ module uvmt_cv32e20_dut_wrap #(
     x_result_t     x_result;
 
     // CSR vec mode
-    logic          csr_vec_mode;
+    logic[DATA_WIDTH-1:0]          csr_vec_mode;
 
     // DMV intermediate signals
     snt_std_if dmv_std();
