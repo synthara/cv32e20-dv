@@ -32,7 +32,8 @@ DPI_DASM_SPIKE_REPO  ?= https://github.com/riscv/riscv-isa-sim.git
 CV_SW_TOOLCHAIN      ?= /opt/riscv
 CV_SW_PREFIX         ?= " "
 
-CORE_DEFINES         = +define+CV32E20_RVFI+RVFI
+#CORE_DEFINES         = +define+CV32E20_RVFI+RVFI
+CORE_DEFINES         = ""
 
 UVM_VERBOSITY        ?= UVM_LOW
 
