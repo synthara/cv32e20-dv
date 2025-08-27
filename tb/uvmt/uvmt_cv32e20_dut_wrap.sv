@@ -176,51 +176,14 @@ module uvmt_cv32e20_dut_wrap #(
 //         );
 
 // #############################################################################################################################à
-//cve_cor_wrp cv32e20_top_i( // Put the same instance name of the rtl so that nothing has to be changed in the tb
-//       .clk(clknrst_if.clk),
-//       .resetn(clknrst_if.reset_n),
-//       .test_en_i('1),
-//       .ram_cfg_i('0),
-//       .ram_cfg_en_i('0), 
-//       .rf_cfg_en_i('0),
-//       .rf_cfg_i('0),
-//       .hart_id_i('0),
-//       .boot_addr_i(core_cntrl_if.boot_addr), 
-//       .instr_req_o(obi_memory_instr_if.req),
-//       .instr_gnt_i(obi_memory_instr_if.gnt),
-//       .instr_rvalid_i(obi_memory_instr_if.rvalid),
-//       .instr_addr_o(obi_memory_instr_if.addr),
-//       .instr_rdata_i(obi_memory_instr_if.rdata), 
-//       .instr_err_i('0),
-//       .data_req_o(obi_memory_data_if.req),
-//       .data_gnt_i(obi_memory_data_if.gnt),
-//       .data_rvalid_i(obi_memory_data_if.rvalid),
-//       .data_we_o(obi_memory_data_if.we), 
-//       .data_be_o(obi_memory_data_if.be),
-//       .data_addr_o(obi_memory_data_if.addr),
-//       .data_wdata_o(obi_memory_data_if.wdata),
-//       .data_rdata_i(obi_memory_data_if.rdata),
-//       .data_err_i('0),
-//       .irq_software_i(irq_uvma[3]),
-//       .irq_timer_i(irq_uvma[7]),
-//       .irq_external_i(irq_uvma[11]),
-//       .irq_fast_i(irq_uvma[31:16]),
-//       .irq_nm_i(irq_uvma[0]), 
-//       .debug_req_i(debug_req_uvma),
-//       .current_pc(),
-//       .next_pc(),
-//       .last_data_addr(),
-//       .exception_addr(), 
-//       .fetch_enable_i(core_cntrl_if.fetch_en),
-//       .core_sleep_o()
-//);
-
-
-cve2_top cv32e20_top_i( // Put the same instance name of the rtl so that nothing has to be changed in the tb
-       .clk_i(clknrst_if.clk),
-       .rst_ni(clknrst_if.reset_n),
+trs_cor_wrp cv32e20_top_i( // Put the same instance name of the rtl so that nothing has to be changed in the tb
+       .clk(clknrst_if.clk),
+       .resetn(clknrst_if.reset_n),
        .test_en_i('1),
        .ram_cfg_i('0),
+       .ram_cfg_en_i('0), 
+       .rf_cfg_en_i('0),
+       .rf_cfg_i('0),
        .hart_id_i('0),
        .boot_addr_i(core_cntrl_if.boot_addr), 
        .instr_req_o(obi_memory_instr_if.req),
@@ -244,10 +207,14 @@ cve2_top cv32e20_top_i( // Put the same instance name of the rtl so that nothing
        .irq_fast_i(irq_uvma[31:16]),
        .irq_nm_i(irq_uvma[0]), 
        .debug_req_i(debug_req_uvma),
-       .crash_dump_o(),
+       .current_pc(),
+       .next_pc(),
+       .last_data_addr(),
+       .exception_addr(), 
        .fetch_enable_i(core_cntrl_if.fetch_en),
        .core_sleep_o()
 );
+
 
 
 
