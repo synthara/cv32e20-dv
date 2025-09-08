@@ -340,7 +340,7 @@ module uvmt_cv32e20_dut_wrap #(
       always_comb mem_dmv[0].valid = obi_memory_data_if.rvalid;
       always_comb mem_dmv[0].packet = obi_memory_data_if.rdata;
 
-      localparam stream_addr_dtype LANE_ADDR[NUM_AGU-1:0] = '{5'd30};
+      localparam stream_addr_dtype LANE_ADDR[NUM_AGU-1:0] = '{5'd29};
 
       sls_dmv#(
         .LANE_ADDR(LANE_ADDR)
