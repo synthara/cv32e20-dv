@@ -24,6 +24,9 @@
  * Object encapsulating all parameters for creating, connecting and running
  * CV32E20 environment (uvme_cv32e20_env_c) components.
  */
+
+ import uvma_cvxif_pkg::*;
+
 class uvme_cv32e20_cfg_c extends uvma_core_cntrl_cfg_c;
 
     rand int unsigned                sys_clk_period;
@@ -41,6 +44,7 @@ class uvme_cv32e20_cfg_c extends uvma_core_cntrl_cfg_c;
    rand uvma_obi_memory_cfg_c obi_memory_data_cfg;
 
    rand uvma_rvfi_cfg_c#(ILEN,XLEN)       rvfi_cfg;
+   rand uvma_cvxif_cfg_c                  cvxif_cfg;
 
    longint unsigned vp_virtual_printer_symbol = 32'h1000_0000;
    longint unsigned vp_virtual_printer_legacy = 32'h1000_0000;
@@ -71,6 +75,7 @@ class uvme_cv32e20_cfg_c extends uvma_core_cntrl_cfg_c;
       `uvm_field_object(obi_memory_instr_cfg, UVM_DEFAULT)
       `uvm_field_object(obi_memory_data_cfg , UVM_DEFAULT)
       `uvm_field_object(rvfi_cfg            , UVM_DEFAULT)
+      `uvm_field_object(cvxif_cfg           , UVM_DEFAULT)
 
       // TODO Add scoreboard cfg field macros
       //      Ex: `uvm_field_object(sb_egress_cfg , UVM_DEFAULT)
@@ -184,6 +189,8 @@ constraint cve2_riscv_cons {
          debug_cfg.enabled             == 1;
          obi_memory_instr_cfg.enabled  == 1;
          obi_memory_data_cfg.enabled   == 1;
+         cvxif_cfg.enabled_cvxif       == 1;
+         cvxif_cfg.cov_model_enabled   == 1;
          rvfi_cfg.enabled              == 1;
          rvfi_cfg.unified_csr_vif      == 1;
       }
@@ -274,6 +281,7 @@ function uvme_cv32e20_cfg_c::new(string name="uvme_cv32e20_cfg");
    obi_memory_data_cfg   = uvma_obi_memory_cfg_c::type_id::create("obi_memory_data_cfg" );
 
    rvfi_cfg              = uvma_rvfi_cfg_c#(ILEN,XLEN)::type_id::create("rvfi_cfg");
+   cvxif_cfg             = uvma_cvxif_cfg_c           ::type_id::create("cvxif_cfg");
 
    rvfi_cfg.core_cfg = this;
 

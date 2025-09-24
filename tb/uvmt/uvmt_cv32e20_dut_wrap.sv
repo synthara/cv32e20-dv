@@ -53,7 +53,8 @@ module uvmt_cv32e20_dut_wrap #(
                             uvme_cv32e20_core_cntrl_if   core_cntrl_if,
                             uvmt_cv32e20_core_status_if  core_status_if,
                             uvma_obi_memory_if           obi_memory_instr_if,
-                            uvma_obi_memory_if           obi_memory_data_if
+                            uvma_obi_memory_if           obi_memory_data_if,
+                            uvma_cvxif_intf              cvxif_if
                            );
 
     // signals connecting core to memory
@@ -254,6 +255,25 @@ module uvmt_cv32e20_dut_wrap #(
          .fetch_enable_i          (core_cntrl_if.fetch_en              ), // fetch_enable_t
          .core_sleep_o            ()
         );
+
+        //=== CVXIF Interface Binding ===
+        assign cvxif_if.issue_valid                = x_issue_valid;
+        assign cvxif_if.issue_req.instr            = x_issue_req.instr;
+        assign cvxif_if.issue_resp.accept          = x_issue_resp.accept;
+        assign cvxif_if.issue_resp.writeback       = x_issue_resp.writeback;
+        assign cvxif_if.issue_resp.register_read   = x_issue_resp.register_read;
+        assign cvxif_if.issue_ready                = x_issue_ready;
+        assign cvxif_if.register.rs_valid          = x_register.rs_valid;
+        assign cvxif_if.register.rs[0]             = x_register.rs[0];
+        assign cvxif_if.register.rs[1]             = x_register.rs[1];
+        assign cvxif_if.register.rs[2]             = x_register.rs[2];
+        assign cvxif_if.commit_valid               = x_commit_valid;
+        assign cvxif_if.commit_req.commit_kill     = x_commit.commit_kill;
+        assign cvxif_if.result_valid               = x_result_valid;
+        assign cvxif_if.result_ready               = x_result_ready;
+        assign cvxif_if.result.data                = x_result.data;
+        assign cvxif_if.result.rd                  = x_result.rd;
+        assign cvxif_if.result.we                  = x_result.we;
 
 //---------------------------------------------------------------------------------
       // Coprocessor instance

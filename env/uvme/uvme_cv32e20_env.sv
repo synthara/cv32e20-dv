@@ -51,6 +51,7 @@ class uvme_cv32e20_env_c extends uvm_env;
    uvma_obi_memory_agent_c  obi_memory_instr_agent;
    uvma_obi_memory_agent_c  obi_memory_data_agent;
    uvma_cv32e20_core_cntrl_agent_c core_cntrl_agent;
+   uvma_cvxif_agent_c       cvxif_agent;
 
    uvma_rvfi_agent_c#(ILEN,XLEN)      rvfi_agent;
 
@@ -394,6 +395,7 @@ function void uvme_cv32e20_env_c::assign_cfg();
 
    uvm_config_db#(uvma_core_cntrl_cfg_c)::set(this, "core_cntrl_agent",       "cfg", cfg);
    uvm_config_db#(uvma_rvfi_cfg_c#(ILEN,XLEN))::set(this, "*rvfi_agent",      "cfg", cfg.rvfi_cfg);
+   uvm_config_db#(uvma_cvxif_cfg_c)     ::set(this, "cvxif_agent",            "cfg", cfg.cvxif_cfg);
 
    if (cfg.scoreboard_enabled) begin
       uvm_config_db#(uvma_core_cntrl_cfg_c)::set(this, "reference_model", "cfg", cfg);
@@ -425,6 +427,7 @@ function void uvme_cv32e20_env_c::create_agents();
    obi_memory_data_agent   = uvma_obi_memory_agent_c::type_id::create("obi_memory_data_agent",  this);
    rvfi_agent              = uvma_rvfi_agent_c#(ILEN,XLEN)::type_id::create("rvfi_agent",       this);
    core_cntrl_agent        = uvma_cv32e20_core_cntrl_agent_c::type_id::create("core_cntrl_agent", this);
+   cvxif_agent             = uvma_cvxif_agent_c     ::type_id::create("cvxif_agent",            this);
 
 endfunction: create_agents
 
@@ -468,6 +471,10 @@ function void uvme_cv32e20_env_c::connect_scoreboard();
     rvfi_agent.rvfi_core_ap.connect(sb.m_rvfi_scoreboard.m_imp_core);
     rvfi_agent.rvfi_core_ap.connect(reference_model.m_analysis_imp);
     reference_model.m_analysis_port.connect(sb.m_rvfi_scoreboard.m_imp_reference_model);
+    cvxif_agent.monitor.resp_ap.connect(sb.m_rvfi_scoreboard.m_imp_cvxif_resp_rtl);
+    reference_model.m_ap_cvxif_resp.connect(sb.m_rvfi_scoreboard.m_imp_cvxif_resp_ref_model);
+    cvxif_agent.monitor.req_ap.connect(sb.m_rvfi_scoreboard.m_imp_cvxif_req_rtl);
+    reference_model.m_ap_cvxif_req.connect(sb.m_rvfi_scoreboard.m_imp_cvxif_req_ref_model);
 
 endfunction: connect_scoreboard
 

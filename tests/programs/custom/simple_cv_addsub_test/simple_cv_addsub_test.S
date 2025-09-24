@@ -18,12 +18,13 @@ _start_main:
     li x7,  0xFFFFFFFF     # -1 (signed)
     li x8,  0x0000001F     # 31 → test shift massimo
     li x9,  0x00000020     # 32 → dovrebbe diventare shift 0
+    li x13,  0x00000005    
 
     csrrwi      x0, 0xA0, 0x3
 
     addi x22, x14, -1963
-    cv.addRNr    x13, x2, x4
-    cv.addRNr    x30, x2, x3
+    cv.addRNr    x13, x2, x9
+    cv.addRNr    x30, x5, x3
     cv.addRNr    x15, x6, x4
     cv.addNr    x10, x2, x5
     cv.subRNr    x14, x5, x3
@@ -446,5 +447,4 @@ _start_main:
     cv.addNr    x22, x9, x4
     cv.subuNr    x12, x4, x5
     cv.addNr    x13, x2, x5
-end_test:
-    wfi
+    j _test_pass

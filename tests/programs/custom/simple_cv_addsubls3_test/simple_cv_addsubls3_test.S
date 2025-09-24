@@ -910,5 +910,4 @@ _start_main:
     cv.subRN x28, x9, x7, 25
     cv.addRN x23, x1, x5, 0
     cv.adduN x22, x5, x2, 15
-end_test:
-    wfi
+    j _test_pass
